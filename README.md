@@ -33,7 +33,7 @@ the script (same as logging in via the website), it is passed in as `--dev_key`
 
 ## Install under Windows ##
 
-Under Windows Python is not installed by default but may have been installed via another app. Open a 'Command prompt'
+Under Windows Python is not installed by default but may have been installed via another program. Open a 'Command prompt'
 (search via start menu) and type:
 
 ```
@@ -94,7 +94,7 @@ This means the script is working but you need to pass it the inputs. See the `Us
 
 ## Usage ##
 
-It is recommended you copy these commands to a text file (e.g., in Notepad) so they are easier to edit then past them
+It is recommended you copy these commands to a text file (e.g., in Notepad) so they are easier to edit then paste them
 from there to the command prompt / Terminal.
 
 To run for TT1 use:
