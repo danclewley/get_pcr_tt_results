@@ -20,8 +20,14 @@ Date: 2017-06-02
 import argparse
 from datetime import timedelta
 import json
-import urllib.parse
-import urllib.request
+import sys
+
+if sys.version_info.major < 3:
+    import urllib2 as request
+    import urllib as parse
+else:
+    from urllib import parse
+    from urllib import request
 
 # URL to get all info from a segment
 # see https://strava.github.io/api/v3/segments/
@@ -87,14 +93,14 @@ def _get_time(item):
     return item["elapsed_time"]
 
 # Set date
-date_data = urllib.parse.urlencode({"start_date_local" : "{}T00:00:00Z".format(args.start_date), 
+date_data = parse.urlencode({"start_date_local" : "{}T00:00:00Z".format(args.start_date), 
                                     "end_date_local"   : "{}T23:59:59Z".format(args.end_date)})
 
 # Get all segment efforts
-seg_req = urllib.request.Request(SEGMENT_URL.format(segment_id), date_data.encode(),
+seg_req = request.Request(SEGMENT_URL.format(segment_id), date_data.encode(),
                       {"Authorization" : "Bearer {}".format(args.dev_key)},
                       method="GET")
-seg_req_str = urllib.request.urlopen(seg_req).read()
+seg_req_str = request.urlopen(seg_req).read()
 
 seg_req_dict = json.loads(seg_req_str.decode())
 
@@ -112,9 +118,9 @@ for pos, effort in enumerate(seg_req_dict):
     date = effort["start_date_local"]
 
     # Get athlete name and gender
-    athlete_req = urllib.request.Request(ATHLETE_URL.format(athlete_id), None,
+    athlete_req = request.Request(ATHLETE_URL.format(athlete_id), None,
                                          {"Authorization" : "Bearer {}".format(args.dev_key)})
-    athlete_req_str = urllib.request.urlopen(athlete_req).read()
+    athlete_req_str = request.urlopen(athlete_req).read()
     athlete_req_dict = json.loads(athlete_req_str.decode())
 
     name = "{} {}".format(athlete_req_dict["firstname"], athlete_req_dict["lastname"])
