@@ -117,7 +117,7 @@ First, Last, 1:20:00, 3, M, 2017-05-28T10:00:00Z, https://www.strava.com/activit
 
 Which can be copied into Excel.
 
-For TT2 and TT3, the `--tt2` and `--tt3` flags are used instead
+For TT2, TT3 and the triple (3-2-1), the `--tt2`, `--tt3` and `-tt321` flags are used instead
 
 ```
 python get_pcr_tt_results.py --tt2 --dev_key YOUR_DEV_KEY--start_date 2017-05-27 --end_date 2017-05-29
@@ -125,5 +125,8 @@ python get_pcr_tt_results.py --tt2 --dev_key YOUR_DEV_KEY--start_date 2017-05-27
 
 ```
 python get_pcr_tt_results.py --tt3 --dev_key YOUR_DEV_KEY--start_date 2017-05-27 --end_date 2017-05-29
+```
+```
+python get_pcr_tt_results.py --tt321 --dev_key YOUR_DEV_KEY--start_date 2017-05-27 --end_date 2017-05-29
 ```
 

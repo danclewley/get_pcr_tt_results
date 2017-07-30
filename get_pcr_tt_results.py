@@ -44,6 +44,7 @@ ACTIVITY_URL = "https://www.strava.com/activities/{}"
 TT1_SEGMENT_ID = 10014031
 TT2_SEGMENT_ID = 10014001
 TT3_SEGMENT_ID = 10074233
+TT321_SEGMENT_ID = 13052821
 
 # Read input from command line
 parser = argparse.ArgumentParser(description="Get PCR TT efforts within a given date range")
@@ -62,6 +63,10 @@ segment_group.add_argument("--tt3",
                            action="store_true",
                            default=False,
                            help="List efforts for TT3")
+segment_group.add_argument("--tt321",
+                           action="store_true",
+                           default=False,
+                           help="List efforts for the triple 3-2-1")
 parser.add_argument("--start_date",
                     required=True,
                     help="Start date in format YY-MM-DD (assumes time is 00:00:00")
@@ -82,6 +87,8 @@ elif args.tt2:
     segment_id = TT2_SEGMENT_ID
 elif args.tt3:
     segment_id = TT3_SEGMENT_ID
+elif args.tt321:
+    segment_id = TT321_SEGMENT_ID
 else:
     segment_id = args.segment_id
 
