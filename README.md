@@ -109,10 +109,10 @@ The default start time is always 00:00 and end time is 23:59.
 This should print something like:
 
 ```
-Name, Time, Position, Gender, Date, URL
-First, Last, 1:00:00, 1, M, 2017-05-28T10:00:00Z, https://www.strava.com/activities/0000000
-First, Last, 1:10:00, 2, F, 2017-05-28T10:00:00Z, https://www.strava.com/activities/0000000
-First, Last, 1:20:00, 3, M, 2017-05-28T10:00:00Z, https://www.strava.com/activities/0000000
+Name, Time, Position, Gender, Date, PB, URL
+First, Last, 1:00:00, 1, M, 2017-05-28T10:00:00Z, First Time, https://www.strava.com/activities/0000000
+First, Last, 1:10:00, 2, F, 2017-05-28T10:00:00Z, PB, https://www.strava.com/activities/0000000
+First, Last, 1:20:00, 3, M, 2017-05-28T10:00:00Z, ,https://www.strava.com/activities/0000000
 ```
 
 Which can be copied into Excel.

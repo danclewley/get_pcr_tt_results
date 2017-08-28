@@ -114,7 +114,7 @@ seg_req_dict = json.loads(seg_req_str.decode())
 # Sort by time
 seg_req_dict =  sorted(seg_req_dict, key=_get_time)
 
-print("Name, Time, Position, Gender, Date, URL")
+print("Name, Time, Position, Gender, Date, PB, URL")
 
 for pos, effort in enumerate(seg_req_dict):
     athlete_id = effort["athlete"]["id"]
@@ -123,6 +123,16 @@ for pos, effort in enumerate(seg_req_dict):
     time_sec = effort["elapsed_time"]
     time_hours = str(timedelta(seconds=(time_sec)))
     date = effort["start_date_local"]
+
+    # Check for personal segment rank
+    # If None is first time for segment
+    if effort["pr_rank"] is None:
+        pb_string = "First Time"
+    # If 1 new PB
+    elif effort["pr_rank"] == 1:
+        pb_string = "PB"
+    else:
+        pb_string = ""
 
     # Get athlete name and gender
     athlete_req = request.Request(ATHLETE_URL.format(athlete_id), None,
@@ -134,6 +144,7 @@ for pos, effort in enumerate(seg_req_dict):
     sex = athlete_req_dict["sex"]
 
     print("{name}, {time}, {pos}, {gender}, "
-          "{date}, {url}".format(name=name, time=time_hours,
-                                 pos=pos+1, gender=sex,
-                                 date=date, url=activity_url))
+          "{date}, {pb}, {url}".format(name=name, time=time_hours,
+                                       pos=pos+1, gender=sex,
+                                       date=date, pb=pb_string,
+                                       url=activity_url))
