@@ -29,6 +29,12 @@ else:
     from urllib import parse
     from urllib import request
 
+HAVE_TABULATE = True
+try:
+    import tabulate
+except ImportError:
+    HAVE_TABULATE = False
+
 # URL to get all info from a segment
 # see https://strava.github.io/api/v3/segments/
 SEGMENT_URL = "https://www.strava.com/api/v3/segments/{}/all_efforts"
@@ -67,12 +73,21 @@ segment_group.add_argument("--tt321",
                            action="store_true",
                            default=False,
                            help="List efforts for the triple 3-2-1")
+parser.add_argument("--num_attempts",
+                    action="store_true",
+                    default=False,
+                    help="Print number of times an athlete has attemted the "
+                         "segment")
+parser.add_argument("--pritty_print",
+                    action="store_true",
+                    default=False,
+                    help="Format table for better output")
 parser.add_argument("--start_date",
                     required=True,
-                    help="Start date in format YY-MM-DD (assumes time is 00:00:00")
+                    help="Start date in format YY-MM-DD (assumes time is 00:00:00)")
 parser.add_argument("--end_date",
                     required=True,
-                    help="End date in format YY-MM-DD (assumes time is 23:59:59")
+                    help="End date in format YY-MM-DD (assumes time is 23:59:59)")
 parser.add_argument("--dev_key",
                     required=True,
                     help="Strava development key for authentication")
@@ -114,7 +129,10 @@ seg_req_dict = json.loads(seg_req_str.decode())
 # Sort by time
 seg_req_dict =  sorted(seg_req_dict, key=_get_time)
 
-print("Name, Time, Position, Gender, Date, PB, URL")
+header = ["Name", "Time", "Position", "Gender", "Date", "PB", "URL"]
+results_lines = []
+
+total_attempts_athelete = {}
 
 for pos, effort in enumerate(seg_req_dict):
     athlete_id = effort["athlete"]["id"]
@@ -126,10 +144,7 @@ for pos, effort in enumerate(seg_req_dict):
 
     # Check for personal segment rank
     # If None is first time for segment
-    if effort["pr_rank"] is None:
-        pb_string = "First Time"
-    # If 1 new PB
-    elif effort["pr_rank"] == 1:
+    if effort["pr_rank"] == 1:
         pb_string = "PB"
     else:
         pb_string = ""
@@ -143,8 +158,29 @@ for pos, effort in enumerate(seg_req_dict):
     name = "{} {}".format(athlete_req_dict["firstname"], athlete_req_dict["lastname"])
     sex = athlete_req_dict["sex"]
 
-    print("{name}, {time}, {pos}, {gender}, "
-          "{date}, {pb}, {url}".format(name=name, time=time_hours,
-                                       pos=pos+1, gender=sex,
-                                       date=date, pb=pb_string,
-                                       url=activity_url))
+    # Itterate total attempts for athelete
+    try:
+        total_attempts_athelete[name] += 1
+    except KeyError:
+        total_attempts_athelete[name] = 1
+
+    out_line = [name, time_hours, pos+1, sex,
+                date, pb_string, activity_url]
+
+    results_lines.append(out_line)
+
+
+if args.pritty_print and HAVE_TABULATE:
+    print(tabulate.tabulate(results_lines, header, tablefmt="fancy_grid"))
+else:
+    print(",".join(header))
+    for line in results_lines:
+        line = [str(i) for i in line]
+        print(",".join(line))
+
+
+if args.num_attempts:
+    print("\n\n")
+    print("Name, NumAttempts")
+    for key, value in total_attempts_athelete.items():
+        print(key, value)

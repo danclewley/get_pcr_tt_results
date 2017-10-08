@@ -26,7 +26,11 @@ else:
     from urllib import parse
     from urllib import request
 
-import tabulate
+HAVE_TABULATE = True
+try:
+    import tabulate
+except ImportError:
+    HAVE_TABULATE = False
 
 # URL to get all info from a segment
 # see https://strava.github.io/api/v3/segments/
@@ -60,6 +64,10 @@ if __name__ == "__main__":
     parser.add_argument("--dev_key",
                         required=True,
                         help="Strava development key for authentication")
+    parser.add_argument("--pritty_print",
+                    action="store_true",
+                    default=False,
+                    help="Format table for better output")
     args = parser.parse_args()
     
     all_segments = {"TT1" : TT1_SEGMENT_ID,
@@ -134,7 +142,7 @@ if __name__ == "__main__":
         tt1_attempts = results["TT1"]
         tt2_attempts = results["TT2"]
         tt3_attempts = results["TT3"]
-        triple_attempts = results["TT3"]
+        triple_attempts = results["Triple"]
         pb_attempts = results["PBs"]
         total_points = results["Total"]
 
@@ -142,4 +150,11 @@ if __name__ == "__main__":
                     triple_attempts, pb_attempts, total_points]
         results_lines.append(out_line)
 
-    print(tabulate.tabulate(results_lines, header, tablefmt="fancy_grid"))
+
+    if args.pritty_print and HAVE_TABULATE:
+        print(tabulate.tabulate(results_lines, header, tablefmt="fancy_grid"))
+    else:
+        print(",".join(header))
+        for line in results_lines:
+            line = [str(i) for i in line]
+            print(",".join(line))
