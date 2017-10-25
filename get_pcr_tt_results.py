@@ -116,14 +116,14 @@ def _get_time(item):
 
 # Set date
 date_data = parse.urlencode({"start_date_local" : "{}T00:00:00Z".format(args.start_date), 
-                                    "end_date_local"   : "{}T23:59:59Z".format(args.end_date)})
+                             "end_date_local"   : "{}T23:59:59Z".format(args.end_date),
+                             "per_page" : "100"},)
 
 # Get all segment efforts
 seg_req = request.Request(SEGMENT_URL.format(segment_id), date_data.encode(),
                       {"Authorization" : "Bearer {}".format(args.dev_key)},
                       method="GET")
 seg_req_str = request.urlopen(seg_req).read()
-
 seg_req_dict = json.loads(seg_req_str.decode())
 
 # Sort by time
