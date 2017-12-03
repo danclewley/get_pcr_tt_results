@@ -90,7 +90,7 @@ if __name__ == "__main__":
     # Set date
     date_data = parse.urlencode({"start_date_local" : "{}T00:00:00Z".format(args.start_date), 
                                  "end_date_local"   : "{}T23:59:59Z".format(args.end_date),
-                                 "per_page" : "100"},)
+                                 "per_page" : "200"},)
     
     for segment_name, segment_id in all_segments.items():
         # Get all segment efforts

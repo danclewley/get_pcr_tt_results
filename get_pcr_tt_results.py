@@ -117,7 +117,7 @@ def _get_time(item):
 # Set date
 date_data = parse.urlencode({"start_date_local" : "{}T00:00:00Z".format(args.start_date), 
                              "end_date_local"   : "{}T23:59:59Z".format(args.end_date),
-                             "per_page" : "100"},)
+                             "per_page" : "200" },)
 
 # Get all segment efforts
 seg_req = request.Request(SEGMENT_URL.format(segment_id), date_data.encode(),
