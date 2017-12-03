@@ -10,6 +10,7 @@ Segments are
 * TT1: https://www.strava.com/segments/10014031
 * TT2: https://www.strava.com/segments/10014001
 * TT3: https://www.strava.com/segments/10074233
+* Triple: https://www.strava.com/segments/13052821
 
 ## Getting API Key ##
 
