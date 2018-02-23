@@ -18,6 +18,7 @@ Date: 2017-06-02
 """
 
 import argparse
+import time
 from datetime import timedelta
 import json
 import sys
@@ -36,8 +37,8 @@ except ImportError:
     HAVE_TABULATE = False
 
 # URL to get all info from a segment
-# see https://strava.github.io/api/v3/segments/
-SEGMENT_URL = "https://www.strava.com/api/v3/segments/{}/all_efforts"
+# see https://developers.strava.com/docs/reference/#api-Segments-getLeaderboardBySegmentId
+SEGMENT_URL = "https://www.strava.com/api/v3/segments/{}/leaderboard"
 
 # URL to get info about an athelete
 # see https://strava.github.io/api/v3/athlete/
@@ -73,21 +74,16 @@ segment_group.add_argument("--tt321",
                            action="store_true",
                            default=False,
                            help="List efforts for the triple 3-2-1")
-parser.add_argument("--num_attempts",
-                    action="store_true",
-                    default=False,
-                    help="Print number of times an athlete has attemted the "
-                         "segment")
 parser.add_argument("--pritty_print",
                     action="store_true",
                     default=False,
                     help="Format table for better output")
 parser.add_argument("--start_date",
                     required=True,
-                    help="Start date in format YY-MM-DD (assumes time is 00:00:00)")
+                    help="Start date in format YY-MM-DDTHH:MM:SS")
 parser.add_argument("--end_date",
                     required=True,
-                    help="End date in format YY-MM-DD (assumes time is 23:59:59)")
+                    help="End date in format YY-MM-DDTHH:MM:SS")
 parser.add_argument("--dev_key",
                     required=True,
                     help="Strava development key for authentication")
@@ -114,10 +110,22 @@ def _get_time(item):
     """
     return item["elapsed_time"]
 
+start_time = time.strptime(args.start_date, "%Y-%m-%dT%H:%M:%S")
+end_time = time.strptime(args.end_date, "%Y-%m-%dT%H:%M:%S")
+
+start_time_epoch = time.mktime(start_time)
+end_time_epoch = time.mktime(end_time)
+
+# If results are for current month then only get results for month
+# else need to get for year.
+if end_time.tm_mon == time.gmtime().tm_mon:
+    date_range = "this_month"
+else:
+    date_range = "this_year"
+
 # Set date
-date_data = parse.urlencode({"start_date_local" : "{}T00:00:00Z".format(args.start_date), 
-                             "end_date_local"   : "{}T23:59:59Z".format(args.end_date),
-                             "per_page" : "200" },)
+date_data = parse.urlencode({"date_range" : date_range,
+                             "per_page" : "200"},)
 
 # Get all segment efforts
 seg_req = request.Request(SEGMENT_URL.format(segment_id), date_data.encode(),
@@ -125,6 +133,7 @@ seg_req = request.Request(SEGMENT_URL.format(segment_id), date_data.encode(),
                       method="GET")
 seg_req_str = request.urlopen(seg_req).read()
 seg_req_dict = json.loads(seg_req_str.decode())
+seg_req_dict = seg_req_dict["entries"]
 
 # Sort by time
 seg_req_dict =  sorted(seg_req_dict, key=_get_time)
@@ -132,43 +141,21 @@ seg_req_dict =  sorted(seg_req_dict, key=_get_time)
 header = ["Name", "Time", "Position", "Gender", "Date", "PB", "URL"]
 results_lines = []
 
-total_attempts_athelete = {}
-
 for pos, effort in enumerate(seg_req_dict):
-    athlete_id = effort["athlete"]["id"]
-    activity_id = effort["activity"]["id"]
-    activity_url = ACTIVITY_URL.format(activity_id)
+    name = effort["athlete_name"]
     time_sec = effort["elapsed_time"]
     time_hours = str(timedelta(seconds=(time_sec)))
     date = effort["start_date_local"]
+    date_epoch = time.mktime(time.strptime(date[:-1], "%Y-%m-%dT%H:%M:%S"))
 
-    # Check for personal segment rank
-    # If None is first time for segment
-    if effort["pr_rank"] == 1:
-        pb_string = "PB"
-    else:
-        pb_string = ""
-
-    # Get athlete name and gender
-    athlete_req = request.Request(ATHLETE_URL.format(athlete_id), None,
-                                         {"Authorization" : "Bearer {}".format(args.dev_key)})
-    athlete_req_str = request.urlopen(athlete_req).read()
-    athlete_req_dict = json.loads(athlete_req_str.decode())
-
-    name = "{} {}".format(athlete_req_dict["firstname"], athlete_req_dict["lastname"])
-    sex = athlete_req_dict["sex"]
-
-    # Itterate total attempts for athelete
-    try:
-        total_attempts_athelete[name] += 1
-    except KeyError:
-        total_attempts_athelete[name] = 1
-
+    sex = ""
+    pb_string = ""
+    activity_url = ""
     out_line = [name, time_hours, pos+1, sex,
                 date, pb_string, activity_url]
 
-    results_lines.append(out_line)
-
+    if date_epoch > start_time_epoch and date_epoch < end_time_epoch:
+        results_lines.append(out_line)
 
 if args.pritty_print and HAVE_TABULATE:
     print(tabulate.tabulate(results_lines, header, tablefmt="fancy_grid"))
@@ -178,9 +165,3 @@ else:
         line = [str(i) for i in line]
         print(",".join(line))
 
-
-if args.num_attempts:
-    print("\n\n")
-    print("Name, NumAttempts")
-    for key, value in total_attempts_athelete.items():
-        print(key, value)

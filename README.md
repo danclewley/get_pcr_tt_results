@@ -101,11 +101,12 @@ from there to the command prompt / Terminal.
 To run for TT1 use:
 
 ```
-python get_pcr_tt_results.py --tt1 --dev_key YOUR_DEV_KEY--start_date 2017-05-27 --end_date 2017-05-29
+python get_pcr_tt_results.py --tt1 --dev_key YOUR_DEV_KEY \
+                             --start_date 2017-05-27T00:00:00 \
+                             --end_date 2017-05-29T23:59:59
 
 ```
 Replacing `YOUR_DEV_KEY` with your Strava API code and editing the start and end date as required.
-The default start time is always 00:00 and end time is 23:59.
 
 This should print something like:
 
@@ -119,15 +120,3 @@ First, Last, 1:20:00, 3, M, 2017-05-28T10:00:00Z, ,https://www.strava.com/activi
 Which can be copied into Excel.
 
 For TT2, TT3 and the triple (3-2-1), the `--tt2`, `--tt3` and `-tt321` flags are used instead
-
-```
-python get_pcr_tt_results.py --tt2 --dev_key YOUR_DEV_KEY--start_date 2017-05-27 --end_date 2017-05-29
-```
-
-```
-python get_pcr_tt_results.py --tt3 --dev_key YOUR_DEV_KEY--start_date 2017-05-27 --end_date 2017-05-29
-```
-```
-python get_pcr_tt_results.py --tt321 --dev_key YOUR_DEV_KEY--start_date 2017-05-27 --end_date 2017-05-29
-```
-
